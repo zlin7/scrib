@@ -1,7 +1,6 @@
 #https://cython.readthedocs.io/en/latest/src/tutorial/numpy.html
 #https://cython-docs2.readthedocs.io/en/latest/src/tutorial/numpy.html
 from libc.stdlib cimport calloc, free
-#from libcpp cimport bool
 
 import numpy as np
 cimport numpy as np

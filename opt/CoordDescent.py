@@ -1,13 +1,17 @@
+import time
+
+import ipdb
 import numpy as np
 import pandas as pd
-from opt.evaluation import SoftLoss
+import tqdm
+
 import utils
-import ipdb, tqdm, time
+from opt.evaluation import SoftLoss
 
 _ALLOW_DEBUG=False
 _ALLOW_RUN = True
-#import opt.QuickSearch_full.QuickSearch as qs
-import opt.QuickSearch.QuickSearch as qs
+import opt.QuickSearch as qs
+
 
 class CoordDescentGlobal():
     def __init__(self, model_output, labels, rks,

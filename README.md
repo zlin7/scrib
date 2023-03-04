@@ -12,8 +12,8 @@ Thus, it only requires `numpy=1.19`.
 It will also require `cython=0.29` to speed up the compute. 
 
 ### Example:
-First, do go `opt.QuickSearch` and follow the `README.md` there to build and test the cython extension.
-Run `opt/CoordDescent.py` to see an example of how to use SCRIB.
+First, try `python -m opt.CoordDescent` to see if the cython code works properly.
+`opt/CoordDescent.py` contains an example of how to use SCRIB.
   
 We've also attached the predictions from the ISRUC, and you can run `demos/examples.ipynb` to replicate the experiment in our paper.
  
