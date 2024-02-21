@@ -1,17 +1,22 @@
 import time
 
-import ipdb
 import numpy as np
 import pandas as pd
 import tqdm
 
-import utils
-from opt.evaluation import SoftLoss
-
-_ALLOW_DEBUG=False
 _ALLOW_RUN = True
 import opt.QuickSearch as qs
 
+OVERALL_LOSSFUNC = 'overall'
+CLASSPECIFIC_LOSSFUNC = 'classSpec'
+
+def parse_loss_func(loss_func:str):
+    loss_kwargs = {}
+    loss_name = loss_func.split()[0]
+    if len(loss_func.split()) > 1:
+        for s in loss_func.split()[1:]:
+            loss_kwargs[s.split('=')[0]] = float(s.split('=')[1])
+    return loss_name, loss_kwargs
 
 class CoordDescentGlobal():
     def __init__(self, model_output, labels, rks,
@@ -21,20 +26,20 @@ class CoordDescentGlobal():
                  fill_max=False):
         self.N, self.K = model_output.shape
 
-        self.loss_name, self.loss_kwargs = SoftLoss.parse_loss_func(loss_func)
-        if self.loss_name == SoftLoss.OVERALL_LOSSFUNC:
+        self.loss_name, self.loss_kwargs = parse_loss_func(loss_func)
+        if self.loss_name == OVERALL_LOSSFUNC:
             assert isinstance(rks, float)
         elif rks is not None:
             rks = np.asarray(rks)
 
         self.max_classes = np.argmax(model_output, 1)
 
-        if len(labels.shape) == 1: labels = utils.to_onehot(labels, self.K)
+        if len(labels.shape) == 1: labels = qs.one_hot(labels, self.K)
         self.loss_kwargs.update({"fill_max": fill_max})
-        if self.loss_name == SoftLoss.CLASSPECIFIC_LOSSFUNC:
+        if self.loss_name == CLASSPECIFIC_LOSSFUNC:
             def _loss_eval(preds):
                 return qs.loss_class_specific_py(preds, self.labels, self.max_classes, self.rks, self.class_weights, **self.loss_kwargs)
-        elif self.loss_name == SoftLoss.OVERALL_LOSSFUNC:
+        elif self.loss_name == OVERALL_LOSSFUNC:
             def _loss_eval(preds):
                 return qs.loss_overall_py(preds, self.labels, self.max_classes, self.rks, **self.loss_kwargs)
         else:
@@ -141,8 +146,8 @@ class CoordDescentCython():
                  fill_max=False):
         self.N, self.K = model_output.shape
 
-        self.loss_name, self.loss_kwargs = SoftLoss.parse_loss_func(loss_func)
-        if self.loss_name == SoftLoss.OVERALL_LOSSFUNC:
+        self.loss_name, self.loss_kwargs = parse_loss_func(loss_func)
+        if self.loss_name == OVERALL_LOSSFUNC:
             assert isinstance(rks, float)
         elif rks is not None:
             rks = np.asarray(rks)
@@ -150,7 +155,7 @@ class CoordDescentCython():
         self.max_classes = np.argmax(model_output, 1)
 
         self.loss_kwargs.update({"fill_max": fill_max})
-        if self.loss_name == SoftLoss.CLASSPECIFIC_LOSSFUNC:
+        if self.loss_name == CLASSPECIFIC_LOSSFUNC:
             def _search_func(ps):
                 return qs.main_coord_descent_class_specific(self.idx2rnk, self.rnk2idx,
                                                             self.labels, self.max_classes,
@@ -162,7 +167,7 @@ class CoordDescentCython():
                                                                ps, self.rks, self.class_weights,
                                                                **self.loss_kwargs)
 
-        elif self.loss_name == SoftLoss.OVERALL_LOSSFUNC:
+        elif self.loss_name == OVERALL_LOSSFUNC:
             self.search_func = lambda ps: qs.main_coord_descent_overall(self.idx2rnk, self.rnk2idx,
                                                                         self.labels, self.max_classes,
                                                                         ps, self.rks, max_step=max_step,

@@ -1,29 +1,14 @@
 import numpy as np
+
 _ALLOW_DEBUG = False
-import utils
+import ipdb
+import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
-import tqdm
-import ipdb
 import sklearn.metrics
-import matplotlib.pyplot as plt
+import tqdm
 
-#+=============================================Loss...........
-class SoftLoss:
-    OVERALL_LOSSFUNC = 'overall'
-    CLASSPECIFIC_LOSSFUNC = 'classSpec'
-
-    def __init__(self):
-        pass
-
-    @classmethod
-    def parse_loss_func(cls, loss_func):
-        loss_kwargs = {}
-        loss_name = loss_func.split()[0]
-        if len(loss_func.split()) > 1:
-            for s in loss_func.split()[1:]:
-                loss_kwargs[s.split('=')[0]] = float(s.split('=')[1])
-        return loss_name, loss_kwargs
+import utils
 
 
 class EvalRisks():

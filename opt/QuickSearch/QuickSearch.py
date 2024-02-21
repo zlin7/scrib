@@ -2,10 +2,9 @@ import numpy as np
 
 
 def one_hot(labels, K=3):
-    labels_py = np.zeros((len(labels), K), dtype=np.int)
-    for i in range(len(labels)):
-        labels_py[i, labels[i]] = 1
-    return labels_py
+    new_labels = np.zeros((len(labels), K))
+    new_labels[np.arange(len(labels)), labels] = 1
+    return new_labels
 
 
 def thresholding_py(ts, output):
